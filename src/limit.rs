@@ -39,7 +39,6 @@ impl Limiter {
             }
 
             shell = shell.replace("path", &p1);
-            //tx.send(shell);
             state.lock().unwrap().insert(p.clone(), shell);
 
             Self::execute(state);
