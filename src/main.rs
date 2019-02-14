@@ -1,17 +1,14 @@
 use gtk::*;
-//use std::process::Command;
 use std::cell::RefCell;
 use std::rc::Rc;
 
 mod limit;
 use limit::{list_process, stop, Limiter};
 
-//const COL: i32 = 0;
-//const MARGIN: i32 = 200;
 fn main() {
     gtk::init().unwrap();
 
-    let mut limiter = Limiter::new();
+    let limiter = Limiter::new();
     let ref_limiter = Rc::new(RefCell::new(limiter));
     let process = list_process();
 
@@ -23,7 +20,7 @@ fn main() {
         let hbox = create_box("h");
         let btn = SpinButton::new_with_range(0.0, 1000.0, 100.0);
         let p2: String = p.clone().to_owned();
-        let mut lc = ref_limiter.clone();
+        let lc = ref_limiter.clone();
         btn.connect_value_changed(move |btn| {
             lc.borrow_mut()
                 .limit(&p2, btn.get_value().to_string(), None);
