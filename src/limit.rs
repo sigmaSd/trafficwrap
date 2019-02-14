@@ -1,8 +1,11 @@
+use std::collections::HashMap;
 use std::fs::File;
 use std::io::Write;
 use std::process::Command;
+use std::sync::mpsc;
+use std::sync::Arc;
+use std::sync::Mutex;
 use std::thread;
-//use std::collections::HashSet;
 
 /*fn main() {
     let (program, download, upload) = parse();
@@ -18,30 +21,57 @@ use std::thread;
     };
     (cmd_args[0].clone(), cmd_args[1].clone(), upload)
 }*/
-
-pub fn limit(p: &str, d: String, u: Option<String>) {
-    let p = p.to_owned();
-    thread::spawn(move || {
-        stop();
-        let mut shell = String::from(
-            "processes:
+pub struct Limiter {
+    state: Arc<Mutex<HashMap<String, String>>>,
+}
+impl Limiter {
+    pub fn new() -> Self {
+        Self {
+            state: Arc::new(Mutex::new(HashMap::new())),
+        }
+    }
+    pub fn limit(&mut self, p: &str, d: String, u: Option<String>) {
+        let p = p.to_owned();
+        let p1 = p.clone();
+        //let (tx, rx) = mpsc::channel();
+        let state = Arc::clone(&self.state);
+        thread::spawn(move || {
+            stop();
+            let mut shell = String::from(
+                "
     app:
         download: dskbps
         upload: uskbps
         match:
             - exe: path",
-        );
+            );
 
-        shell = shell.replace("app", &p.clone().split('/').last().unwrap());
-        shell = shell.replace("ds", &d);
-        if u.is_some() {
-            shell = shell.replace("us", &u.unwrap());
-        } else {
-            shell = shell.replace("upload: uskbps", "");
-        }
+            shell = shell.replace("app", &p1.clone().split('/').last().unwrap());
+            shell = shell.replace("ds", &d);
+            if u.is_some() {
+                shell = shell.replace("us", &u.unwrap());
+            } else {
+                shell = shell.replace("upload: uskbps", "");
+            }
 
-        shell = shell.replace("path", &p);
+            shell = shell.replace("path", &p1);
+            //tx.send(shell);
+            state.lock().unwrap().insert(p.clone(), shell);
 
+            Self::execute(state);
+        });
+        //let shell = rx.try_recv().unwrap();
+    }
+
+    fn execute(state: Arc<Mutex<HashMap<String, String>>>) {
+        let mut shell: String = state
+            .lock()
+            .unwrap()
+            .values()
+            .map(|v| v.to_string())
+            .collect::<Vec<String>>()
+            .join("\n");
+        shell.insert_str(0, "processes:\n");
         let file = File::create("/tmp/traffic_conf").unwrap();
         write!(&file, "{}", shell).unwrap();
 
@@ -52,7 +82,7 @@ pub fn limit(p: &str, d: String, u: Option<String>) {
             .unwrap()
             .wait()
             .unwrap();
-    });
+    }
 }
 
 pub fn list_process() -> Vec<String> {
