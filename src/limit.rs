@@ -29,8 +29,8 @@ impl Limiter {
         match:
             - exe: path",
             );
-
-            shell = shell.replace("app", &p1.clone().split('/').last().unwrap());
+            let app = p1.split('/').last().unwrap();
+            shell = shell.replace("app", &app);
             shell = shell.replace("ds", &d);
             if u.is_some() {
                 shell = shell.replace("us", &u.unwrap());
@@ -39,7 +39,7 @@ impl Limiter {
             }
 
             shell = shell.replace("path", &p1);
-            state.lock().unwrap().insert(p.clone(), shell);
+            state.lock().unwrap().insert(app.to_string(), shell);
 
             Self::execute(state);
         });

@@ -19,7 +19,7 @@ fn main() {
     for p in process.into_iter() {
         let hbox = create_box("h");
         let btn = SpinButton::new_with_range(0.0, 1000.0, 100.0);
-        let p2: String = p.clone().to_owned();
+        let p2: String = p.clone();
         let lc = ref_limiter.clone();
         btn.connect_value_changed(move |btn| {
             lc.borrow_mut()
