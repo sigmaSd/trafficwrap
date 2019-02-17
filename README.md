@@ -1,7 +1,9 @@
-# trafficwrap
-A GUI wrapper over https://github.com/cryzed/TrafficToll
+# Trafficwrap
 
-Right now its just in prototype/hacks phase.
+Netlimiter like app for linux 
+
+**Core:** Wrapper over https://github.com/cryzed/TrafficToll and https://github.com/raboof/nethogs
+
 
 <img src="./tw.png" width="60%" height="60%">
 
