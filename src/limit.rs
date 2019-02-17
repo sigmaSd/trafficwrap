@@ -38,6 +38,12 @@ impl Limiter {
                 shell = shell.replace("upload: uskbps", "");
             }
 
+            // special case 1: firefox
+            let p1 = if p1 == "/usr/lib64/firefox/firefox" {
+                "/usr/lib/firefox/firefox".to_string()
+            } else {
+                p1.clone()
+            };
             shell = shell.replace("path", &p1);
             state.lock().unwrap().insert(app.to_string(), shell);
 
@@ -67,7 +73,7 @@ impl Limiter {
     }
 }
 
-pub fn list_process() -> Vec<String> {
+pub fn _list_process() -> Vec<String> {
     let processs = Command::new("ps").arg("aux").output().unwrap();
     let mut seen_process = vec![];
 
