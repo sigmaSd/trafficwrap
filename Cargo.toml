@@ -5,4 +5,5 @@ authors = ["Nbiba Bedis <bedisnbiba@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-gtk = "*"
+gtk = {git = 'https://github.com/gtk-rs/gtk'}
+glib = {git = 'https://github.com/gtk-rs/glib'}
